@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EarthPulse AI — Climate Awareness & Sustainability Platform</title>
+  <meta name="description" content="The world's most interactive carbon footprint awareness, sustainability education, and climate action platform. Visualize your impact. Change the future." />
+  <meta name="theme-color" content="#0a0f1e" />
+  <link rel="icon" type="image/svg+xml" href="/earth-icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Scroll Progress Bar -->
+  <div id="scroll-progress" aria-hidden="true">
+    <div class="scroll-progress-fill" id="scroll-progress-fill"></div>
+  </div>
+
+  <!-- Particle Background -->
+  <div id="particle-canvas" aria-hidden="true"></div>
+
+  <!-- Aurora Background -->
+  <div id="aurora-bg" aria-hidden="true">
+    <div class="aurora-layer aurora-1"></div>
+    <div class="aurora-layer aurora-2"></div>
+    <div class="aurora-layer aurora-3"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav id="main-nav" aria-label="Section navigation">
+    <div class="nav-logo">
+      <span class="nav-logo-icon">🌍</span>
+      <span class="nav-logo-text">EarthPulse</span>
+    </div>
+    <div class="nav-dots" id="nav-dots"></div>
+    <div class="nav-footer">
+      <button id="eco-mode-toggle" class="nav-btn" aria-label="Toggle eco mode" data-tooltip="Enable Eco-Mode (Low Energy)">
+        <span class="theme-icon" id="eco-icon">🍃</span>
+      </button>
+      <button id="theme-toggle" class="nav-btn" aria-label="Toggle theme" style="margin-top: 0.5rem;" data-tooltip="Toggle Dark/Light Mode">
+        <span class="theme-icon" id="theme-icon">🌙</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Eco Mode Ticker -->
+  <div id="eco-ticker" class="eco-ticker" aria-hidden="true" style="display: none;">
+    <span class="eco-ticker-icon">🍃</span>
+    <span class="eco-ticker-text">Eco-Mode Active: <span id="eco-saved-grams">0</span>g CO₂ saved</span>
+  </div>
+
+  <!-- Earth Companion (persistent) -->
+  <div id="earth-companion" class="earth-companion" aria-live="polite">
+    <div class="companion-speech" id="companion-speech"></div>
+    <div class="companion-body">
+      <div class="companion-face">
+        <div class="companion-eye left"></div>
+        <div class="companion-eye right"></div>
+        <div class="companion-mouth"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main id="app">
+
+    <!-- HERO -->
+    <section id="hero" class="section section-hero" data-section="hero">
+      <div class="hero-content">
+        <div class="hero-badge">🌱 AI-Powered Climate Awareness</div>
+        <h1 class="hero-title">
+          <span class="hero-title-line">Earth</span>
+          <span class="hero-title-line accent">Pulse</span>
+          <span class="hero-title-line dim">AI</span>
+        </h1>
+        <p class="hero-subtitle">Every choice you make shapes the future of our planet.<br/>Discover your impact. Transform it.</p>
+        <div class="hero-cta">
+          <button id="hero-start-btn" class="btn btn-primary btn-glow">Begin Your Journey</button>
+          <button id="hero-explore-btn" class="btn btn-glass">Explore Earth</button>
+        </div>
+        <div class="hero-stats" id="hero-stats"></div>
+      </div>
+      <div class="hero-earth" id="hero-earth-container"></div>
+      <div class="hero-scroll-indicator scroll-indicator" aria-hidden="true">
+        <span>Scroll to explore</span>
+        <div class="scroll-arrow"></div>
+      </div>
+    </section>
+
+    <!-- LIVE CARBON PULSE -->
+    <section id="carbon-pulse" class="section" data-section="carbon-pulse">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <h2 class="section-title">Live Carbon Pulse</h2>
+        <p class="section-desc">Watch the planet's vital signs change in real time — since you opened this page</p>
+      </div>
+      <div class="carbon-pulse-content" id="carbon-pulse-content"></div>
+    </section>
+
+    <!-- SECTION: THE LIVING EARTH -->
+    <section id="living-earth" class="section" data-section="living-earth">
+      <div class="section-header">
+        <span class="section-number">02</span>
+        <h2 class="section-title">The Living Earth</h2>
+        <p class="section-desc">Real-time climate command center — our planet's vital signs</p>
+      </div>
+      <div class="living-earth-grid" id="living-earth-grid"></div>
+    </section>
+
+    <!-- SECTION: REAL-TIME LOCAL ENVIRONMENT -->
+    <section id="local-env" class="section" data-section="local-env">
+      <div class="section-header">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Your Local Environment</h2>
+        <p class="section-desc">Real-time air quality, weather, and sustainability data for your location</p>
+      </div>
+      <div class="local-env-content" id="local-env-content">
+        <div class="local-env-prompt glass-card" id="local-env-prompt">
+          <div style="text-align:center;">
+            <div style="font-size:3rem;margin-bottom:1rem;">📍</div>
+            <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:0.5rem;">Enable Location</h3>
+            <p style="color:var(--text-secondary);margin-bottom:1.5rem;max-width:400px;margin-left:auto;margin-right:auto;">Allow location access to see real-time environmental data for your area, including air quality, weather, and carbon intensity.</p>
+            <button class="btn btn-primary" id="enable-location-btn">📍 Share My Location</button>
+            <button class="btn btn-glass" id="skip-location-btn" style="margin-left:0.75rem;">Use Default</button>
+          </div>
+        </div>
+        <div class="local-env-data" id="local-env-data" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- SECTION: AI CONVERSATIONAL FOOTPRINT -->
+    <section id="footprint-chat" class="section" data-section="footprint-chat">
+      <div class="section-header">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Discover Your Footprint</h2>
+        <p class="section-desc">Let's have a conversation about your lifestyle — no boring forms</p>
+      </div>
+      <div class="chat-container" id="chat-container">
+        <div class="chat-messages" id="chat-messages"></div>
+      </div>
+    </section>
+
+    <!-- SECTION: YOUR CARBON TWIN -->
+    <section id="carbon-twin" class="section" data-section="carbon-twin">
+      <div class="section-header">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Your Carbon Twin</h2>
+        <p class="section-desc">Which country on Earth does your lifestyle match?</p>
+      </div>
+      <div class="carbon-twin-content" id="carbon-twin-content"></div>
+    </section>
+
+    <!-- SECTION: DAILY IMPACT DASHBOARD -->
+    <section id="daily-dashboard" class="section" data-section="daily-dashboard">
+      <div class="section-header">
+        <span class="section-number">06</span>
+        <h2 class="section-title">My Daily Impact</h2>
+        <p class="section-desc">Your footprint, visualized in ways that hit home</p>
+      </div>
+      <div class="dashboard-content" id="dashboard-content">
+        <div class="dashboard-grid" id="dashboard-grid"></div>
+        <div class="dashboard-chart-area" id="dashboard-chart-area"></div>
+      </div>
+    </section>
+
+    <!-- SECTION: CARBON BUDGET -->
+    <section id="carbon-budget" class="section" data-section="carbon-budget">
+      <div class="section-header">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Your Carbon Budget</h2>
+        <p class="section-desc">The <span class="tooltip-trigger" data-tooltip="A legally binding international treaty on climate change adopted in 2015, aiming to limit global warming to 1.5°C.">Paris Agreement</span> gives humanity a finite budget. How much is left?</p>
+      </div>
+      <div class="carbon-budget-content" id="carbon-budget-content"></div>
+    </section>
+
+    <!-- SECTION 6: SMALL ACTIONS BIG IMPACT -->
+    <section id="actions-lab" class="section" data-section="actions-lab">
+      <div class="section-header">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Small Actions, Big Impact</h2>
+        <p class="section-desc">Toggle small changes. Watch Earth transform.</p>
+      </div>
+      <div class="actions-lab-content" id="actions-lab-content"></div>
+    </section>
+
+    <!-- SECTION 7: FUTURE EARTH TIME MACHINE -->
+    <section id="time-machine" class="section" data-section="time-machine">
+      <div class="section-header">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Future Earth Time Machine</h2>
+        <p class="section-desc">Travel to 2100 — what does your Earth look like?</p>
+      </div>
+      <div class="time-machine-content" id="time-machine-content"></div>
+    </section>
+
+    <!-- SECTION 22: GENERATIONAL IMPACT -->
+    <section id="generational" class="section" data-section="generational">
+      <div class="section-header">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Generational Impact</h2>
+        <p class="section-desc">If you continue current habits — what inherits your children?</p>
+      </div>
+      <div class="generational-content" id="generational-content"></div>
+    </section>
+
+    <!-- SECTION 8: STORY OF EVERYTHING -->
+    <section id="consumption-story" class="section" data-section="consumption-story">
+      <div class="section-header">
+        <span class="section-number">08</span>
+        <h2 class="section-title">The Story of Everything You Consume</h2>
+        <p class="section-desc">Click any item — discover its true environmental cost</p>
+      </div>
+      <div class="consumption-grid" id="consumption-grid"></div>
+      <div class="consumption-detail" id="consumption-detail"></div>
+    </section>
+
+    <!-- SECTION: KNOWLEDGE UNIVERSE -->
+    <section id="knowledge-hub" class="section" data-section="knowledge-hub">
+      <div class="section-header">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Environmental Knowledge Universe</h2>
+        <p class="section-desc">Master the science of sustainability</p>
+      </div>
+      <div class="knowledge-grid" id="knowledge-grid"></div>
+    </section>
+
+    <!-- SECTION: CLIMATE IMPACT STORIES -->
+    <section id="impact-stories" class="section" data-section="impact-stories">
+      <div class="section-header">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Stories From a Warming World</h2>
+        <p class="section-desc">Real places, real people, real consequences — happening right now</p>
+      </div>
+      <div class="impact-stories-content" id="impact-stories-content"></div>
+    </section>
+
+    <!-- SECTION 16: MYTH BUSTER -->
+    <section id="myth-buster" class="section" data-section="myth-buster">
+      <div class="section-header">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Climate Myth Buster</h2>
+        <p class="section-desc">Think you know the truth? Let's find out.</p>
+      </div>
+      <div class="myth-game" id="myth-game"></div>
+    </section>
+
+    <!-- SECTION 13: CLIMATE CHALLENGES -->
+    <section id="challenges" class="section" data-section="challenges">
+      <div class="section-header">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Climate Challenges</h2>
+        <p class="section-desc">Daily, weekly, and monthly challenges to reduce your footprint</p>
+      </div>
+      <div class="challenges-content" id="challenges-content"></div>
+    </section>
+
+    <!-- SECTION 23: WHAT IF EVERYONE -->
+    <section id="what-if" class="section" data-section="what-if">
+      <div class="section-header">
+        <span class="section-number">12</span>
+        <h2 class="section-title">What If Everyone Did This?</h2>
+        <p class="section-desc">See the power of collective action</p>
+      </div>
+      <div class="what-if-content" id="what-if-content"></div>
+    </section>
+
+    <!-- SECTION 24: CARBON MARKETPLACE -->
+    <section id="marketplace" class="section" data-section="marketplace">
+      <div class="section-header">
+        <span class="section-number">13</span>
+        <h2 class="section-title">Carbon Marketplace of Actions</h2>
+        <p class="section-desc">Discover the easiest wins — ranked by effort, cost, and impact</p>
+      </div>
+      <div class="marketplace-content" id="marketplace-content"></div>
+    </section>
+
+    <!-- SECTION: COMMUNITY PLEDGE WALL -->
+    <section id="pledge-wall" class="section" data-section="pledge-wall">
+      <div class="section-header">
+        <span class="section-number">16</span>
+        <h2 class="section-title">Community Pledge Wall</h2>
+        <p class="section-desc">Join thousands making a difference — see the power of collective commitment</p>
+      </div>
+      <div class="pledge-wall-content" id="pledge-wall-content"></div>
+    </section>
+
+    <!-- SECTION: SPOTIFY WRAPPED + SHAREABLE CARD -->
+    <section id="wrapped" class="section" data-section="wrapped">
+      <div class="section-header">
+        <span class="section-number">17</span>
+        <h2 class="section-title">Your Climate Story</h2>
+        <p class="section-desc">Your year in sustainability — Wrapped. Share it with the world.</p>
+      </div>
+      <div class="wrapped-content" id="wrapped-content"></div>
+    </section>
+
+    <!-- FINAL: MY EARTH 2050 -->
+    <section id="wow-moment" class="section section-finale" data-section="wow-moment">
+      <div class="section-header">
+        <span class="section-number">✦</span>
+        <h2 class="section-title">My Earth in 2050</h2>
+        <p class="section-desc">Two futures. One choice. Yours.</p>
+      </div>
+      <div class="wow-content" id="wow-content"></div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-logo">🌍 EarthPulse AI</div>
+      <p class="footer-tagline">Making sustainability personal, visual, and actionable.</p>
+      <div class="footer-links">
+        <span>Built with 💚 for Planet Earth</span>
+        <span>·</span>
+        <span>Data sourced from NASA, NOAA, IPCC</span>
+        <span>·</span>
+        <span>No login required</span>
+      </div>
+      <div class="footer-copy">© 2025 EarthPulse AI — Climate Awareness Platform</div>
+    </div>
+  </footer>
+
+  <!-- Global Tooltip -->
+  <div id="global-tooltip" class="global-tooltip" aria-hidden="true"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Receipt Modal Overlay -->
+  <div id="receipt-modal" class="receipt-modal-overlay">
+    <div class="receipt-paper" id="receipt-paper-content">
+      <!-- Generated by main.js -->
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
