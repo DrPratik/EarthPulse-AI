@@ -3266,3 +3266,10 @@ body.eco-mode .nav-dot::before {
   font-size: 1.5rem;
   cursor: pointer;
 }
+
+/* --- Accessibility --- */
+*:focus-visible {
+  outline: 2px solid var(--earth-green-glow);
+  outline-offset: 4px;
+  border-radius: 4px;
+}

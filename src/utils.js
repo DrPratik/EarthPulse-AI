@@ -35,3 +35,17 @@ export function loadData(key, fallback = null) {
     return v ? JSON.parse(v) : fallback;
   } catch(e) { return fallback; }
 }
+
+export function sanitizeHTML(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/[&<>"']/g, function (match) {
+    const escape = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+    return escape[match];
+  });
+}

@@ -1,7 +1,7 @@
 import './styles/index.css';
 import { initParticles, setParticleDanger } from './components/particles.js';
 import { createEarthGlobe } from './components/earth-globe.js';
-import { animateCount, sleep, saveData, loadData } from './utils.js';
+import { animateCount, sleep, saveData, loadData, sanitizeHTML } from './utils.js';
 import {
   climateStats, chatFlow, equivalencies, actions,
   timelineProjections, products, knowledgeTopics, myths,
@@ -318,6 +318,7 @@ function initLivingEarth() {
           const decimals = target < 10 ? 2 : target < 100 ? 1 : 0;
           animateCount(el, target, 1800, decimals);
         });
+        observer.unobserve(entry.target); // Efficiency optimization
       }
     });
   }, { threshold: 0.3 });
@@ -397,7 +398,7 @@ async function fetchLocalEnvData(lat, lon) {
         <div class="local-env-hero">
           <div style="font-size:3.5rem;">📍</div>
           <div>
-            <div class="env-location">${weatherRes.timezone?.replace('/', ' / ') || 'Your Location'}</div>
+            <div class="env-location">${sanitizeHTML(weatherRes.timezone?.replace('/', ' / ')) || 'Your Location'}</div>
             <div class="env-coords">${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E · Elevation: ${weatherRes.elevation || 0}m</div>
           </div>
           <div style="margin-left:auto;text-align:right;">
