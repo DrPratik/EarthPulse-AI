@@ -8,6 +8,7 @@ import {
   whatIfScenarios, companionMessages, wowData,
   challenges, marketplaceActions, generationalData
 } from './data/climate-data.js';
+import { fetchWeatherData, fetchWorldBankEmissions } from './api.js';
 
 // ── App State ──
 const state = {
@@ -360,14 +361,7 @@ async function fetchLocalEnvData(lat, lon) {
   dataDiv.innerHTML = '<div class="glass-card" style="padding:3rem;text-align:center;"><div style="font-size:2rem;">⏳</div><p style="color:var(--text-secondary);margin-top:1rem;">Fetching environmental data...</p></div>';
 
   try {
-    // Use Open-Meteo free API (no key required)
-    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,cloud_cover,uv_index&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
-    const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,ozone,european_aqi`;
-
-    const [weatherRes, aqiRes] = await Promise.all([
-      fetch(weatherUrl).then(r => r.json()),
-      fetch(aqiUrl).then(r => r.json()),
-    ]);
+    const { weatherRes, aqiRes } = await fetchWeatherData(lat, lon);
 
     const w = weatherRes.current;
     const aqi = aqiRes.current;
@@ -501,11 +495,11 @@ async function addChatMessage(stepId) {
 
   typing.innerHTML = `
     <span class="bubble-label">🌍 EarthPulse</span>
-    ${step.message}
+    ${sanitizeHTML(step.message)}
     ${step.options ? `
       <div class="chat-options">
         ${step.options.map(opt => `
-          <button class="btn-option" data-next="${opt.next}" data-impact='${JSON.stringify(opt.impact || {})}'>${opt.text}</button>
+          <button class="btn-option" data-next="${opt.next}" data-impact='${JSON.stringify(opt.impact || {})}'>${sanitizeHTML(opt.text)}</button>
         `).join('')}
       </div>
     ` : ''}
@@ -518,7 +512,7 @@ async function addChatMessage(stepId) {
 
       const userBubble = document.createElement('div');
       userBubble.className = 'chat-bubble user';
-      userBubble.innerHTML = `<span class="bubble-label">You</span>${btn.textContent}`;
+      userBubble.innerHTML = `<span class="bubble-label">You</span>${sanitizeHTML(btn.textContent)}`;
       messages.appendChild(userBubble);
 
       typing.querySelectorAll('.btn-option').forEach(b => {
@@ -1515,48 +1509,6 @@ function initCarbonPulse() {
 
 let worldBankCache = null;
 
-async function fetchWorldBankData() {
-  const cachedStr = localStorage.getItem('worldBankData');
-  const cacheTime = localStorage.getItem('worldBankDataTime');
-  if (cachedStr && cacheTime && (Date.now() - parseInt(cacheTime) < 24 * 60 * 60 * 1000)) {
-    try {
-      return JSON.parse(cachedStr);
-    } catch(e) {}
-  }
-  
-  try {
-    // Note: EN.GHG.CO2.PC.CE.AR5 is used as the active equivalent because EN.ATM.CO2E.PC throws 'indicator not found' in the API.
-    const url = 'https://api.worldbank.org/v2/country/QA;US;DE;IN;KE;WLD/indicator/EN.GHG.CO2.PC.CE.AR5?format=json&per_page=100';
-    const res = await fetch(url);
-    const json = await res.json();
-    if (json && json[1] && Array.isArray(json[1])) {
-      const parsedData = {};
-      for (const entry of json[1]) {
-        const code = entry.countryiso3code || entry.country.id;
-        if (!parsedData[code] && entry.value !== null) {
-          parsedData[code] = parseFloat(entry.value);
-        }
-      }
-      
-      const apiData = {
-        'Qatar': parsedData['QAT'] || 35.6,
-        'United States': parsedData['USA'] || 14.9,
-        'Germany': parsedData['DEU'] || 7.7,
-        'Global Average': parsedData['WLD'] || 4.7,
-        'India': parsedData['IND'] || 1.9,
-        'Kenya': parsedData['KEN'] || 0.3
-      };
-      
-      localStorage.setItem('worldBankData', JSON.stringify(apiData));
-      localStorage.setItem('worldBankDataTime', Date.now().toString());
-      return apiData;
-    }
-  } catch (err) {
-    console.error("World Bank API fetch failed, using fallback.", err);
-  }
-  return null;
-}
-
 async function initCarbonTwin() {
   const container = document.getElementById('carbon-twin-content');
   if (!container) return;
@@ -1568,7 +1520,7 @@ async function initCarbonTwin() {
     </div>
   `;
   
-  worldBankCache = await fetchWorldBankData();
+  worldBankCache = await fetchWorldBankEmissions();
   renderCarbonTwin(state.footprint || 7.2);
 }
 

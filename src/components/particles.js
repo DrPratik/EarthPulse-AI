@@ -1,3 +1,5 @@
+import { debounce } from '../utils.js';
+
 let globalDangerRatio = 0;
 
 export function setParticleDanger(ratio) {
@@ -21,7 +23,7 @@ export function initParticles(container) {
     h = canvas.height = window.innerHeight;
   }
   resize();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', debounce(resize, 200));
 
   // Create particles
   for (let i = 0; i < PARTICLE_COUNT; i++) {
