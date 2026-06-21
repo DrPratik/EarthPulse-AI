@@ -572,6 +572,13 @@ function showChatResult() {
         total > 3 ? "You're doing okay, but there's room to improve. Let's explore actions you can take!" :
         "Amazing! You're already living more sustainably than most people on Earth. Keep inspiring others! 🌱"}
     </p>
+    <a href="https://twitter.com/intent/tweet?text=I%20just%20calculated%20my%20carbon%20footprint%20(${total.toFixed(1)}%20tonnes)%20on%20EarthPulse%20AI!%20%F0%9F%8C%8D%20Join%20me%20in%20taking%20climate%20action%3A&url=https%3A%2F%2FDrPratik.github.io%2FEarthPulse-AI%2F" 
+       target="_blank" 
+       rel="noopener" 
+       class="btn btn-primary btn-glow" 
+       style="display:inline-block; margin-top:1rem; text-decoration:none; width:100%; text-align:center;">
+       🐦 Share My Pledge
+    </a>
   `;
   messages.appendChild(resultBubble);
   messages.scrollTop = messages.scrollHeight;
