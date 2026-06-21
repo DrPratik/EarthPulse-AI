@@ -1,4 +1,12 @@
-// Utility helpers
+/**
+ * Utility helpers
+ * Animates a numerical counter in the DOM from 0 to a target value.
+ *
+ * @param {HTMLElement} el - The DOM element to update.
+ * @param {number} target - The final target number to animate to.
+ * @param {number} [duration=1500] - The animation duration in milliseconds.
+ * @param {number} [decimals=0] - The number of decimal places to format the output.
+ */
 export function animateCount(el, target, duration = 1500, decimals = 0) {
   const start = 0;
   const startTime = performance.now();
@@ -17,18 +25,44 @@ export function animateCount(el, target, duration = 1500, decimals = 0) {
   requestAnimationFrame(tick);
 }
 
+/**
+ * Generates a random float between the specified min and max bounds.
+ *
+ * @param {number} min - The minimum bound (inclusive).
+ * @param {number} max - The maximum bound (exclusive).
+ * @returns {number} A random float within the bounds.
+ */
 export function randomBetween(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+/**
+ * Halts execution for a specified duration using Promises.
+ *
+ * @param {number} ms - The number of milliseconds to sleep.
+ * @returns {Promise<void>} A promise that resolves after the timeout.
+ */
 export function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Saves a key-value pair to the browser's localStorage, wrapped in a namespace.
+ *
+ * @param {string} key - The lookup key.
+ * @param {*} value - The serializable object or primitive to save.
+ */
 export function saveData(key, value) {
   try { localStorage.setItem(`earthpulse_${key}`, JSON.stringify(value)); } catch(e) {}
 }
 
+/**
+ * Retrieves a parsed value from localStorage. Returns a fallback if parsing fails.
+ *
+ * @param {string} key - The lookup key.
+ * @param {*} [fallback=null] - The default value to return if the key doesn't exist.
+ * @returns {*} The parsed object or the fallback value.
+ */
 export function loadData(key, fallback = null) {
   try {
     const v = localStorage.getItem(`earthpulse_${key}`);
@@ -36,6 +70,12 @@ export function loadData(key, fallback = null) {
   } catch(e) { return fallback; }
 }
 
+/**
+ * Escapes unsafe HTML characters to prevent DOM-based XSS attacks.
+ *
+ * @param {string} str - The raw user or API string.
+ * @returns {string} The HTML-escaped safe string.
+ */
 export function sanitizeHTML(str) {
   if (typeof str !== 'string') return str;
   return str.replace(/[&<>"']/g, function (match) {
@@ -50,6 +90,13 @@ export function sanitizeHTML(str) {
   });
 }
 
+/**
+ * Debounces a high-frequency event handler to optimize performance (e.g. window resizing).
+ *
+ * @param {Function} func - The callback function to execute.
+ * @param {number} [wait=100] - The delay in milliseconds to wait before invoking.
+ * @returns {Function} A debounced wrapper function.
+ */
 export function debounce(func, wait = 100) {
   let timeout;
   return function (...args) {

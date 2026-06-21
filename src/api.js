@@ -1,3 +1,12 @@
+/**
+ * Fetches real-time weather and air quality index (AQI) data from the Open-Meteo API.
+ * Uses coordinates to provide localized environmental awareness.
+ * 
+ * @param {number} lat - The latitude coordinate of the user's location.
+ * @param {number} lon - The longitude coordinate of the user's location.
+ * @returns {Promise<{weatherRes: Object, aqiRes: Object}>} A promise resolving to an object containing weather and AQI JSON responses.
+ * @throws {Error} If the network request to Open-Meteo fails.
+ */
 export async function fetchWeatherData(lat, lon) {
   const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,cloud_cover,uv_index&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
   const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,ozone,european_aqi`;
@@ -10,6 +19,13 @@ export async function fetchWeatherData(lat, lon) {
   return { weatherRes, aqiRes };
 }
 
+/**
+ * Fetches the latest global per capita carbon emissions data from the World Bank API.
+ * Includes caching via localStorage to prevent rate limiting and optimize load times (24-hour TTL).
+ * Indicator: EN.GHG.CO2.PC.CE.AR5 (Greenhouse gas emissions per capita).
+ * 
+ * @returns {Promise<Object|null>} A promise resolving to a dictionary mapping country names to metric tonnes of CO2 per capita, or null if failed.
+ */
 export async function fetchWorldBankEmissions() {
   const cachedStr = localStorage.getItem('worldBankData');
   const cacheTime = localStorage.getItem('worldBankDataTime');

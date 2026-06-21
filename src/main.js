@@ -9,24 +9,7 @@ import {
   challenges, marketplaceActions, generationalData
 } from './data/climate-data.js';
 import { fetchWeatherData, fetchWorldBankEmissions } from './api.js';
-
-// ── App State ──
-const state = {
-  currentSection: 'hero',
-  footprint: loadData('footprint', null),
-  chatImpact: {},
-  chatStep: 'welcome',
-  mythIndex: 0,
-  mythScore: { correct: 0, total: 0 },
-  activeActions: loadData('activeActions', {}),
-  joinedChallenges: loadData('joinedChallenges', {}),
-  selectedProduct: null,
-  selectedWhatIf: null,
-  companionMood: 'happy',
-  initialized: new Set(),
-  marketplaceSort: 'impact',
-  challengeTab: 'daily',
-};
+import { state, setState } from './store.js';
 // ── Dynamic Environment ──
 function getCurrentEffectiveFootprint() {
   const base = state.footprint || 7.2;
@@ -402,60 +385,67 @@ async function fetchLocalEnvData(lat, lon) {
         </div>
 
         <div class="local-env-card">
-          <div class="env-card-icon">🌬️</div>
+          <div class="env-card-icon" aria-hidden="true">🌬️</div>
           <div class="env-card-value">${aqi.european_aqi}</div>
           <div class="env-card-label">Air Quality Index (EU)</div>
           <div class="env-card-sub">${aqiLevel}</div>
         </div>
 
         <div class="local-env-card">
-          <div class="env-card-icon">🫁</div>
+          <div class="env-card-icon" aria-hidden="true">🫁</div>
           <div class="env-card-value">${aqi.pm2_5?.toFixed(1) || '—'}</div>
           <div class="env-card-label">PM2.5 (µg/m³)</div>
           <div class="env-card-sub">${aqi.pm2_5 < 12 ? 'Good' : aqi.pm2_5 < 35 ? 'Moderate' : 'Unhealthy'}</div>
         </div>
 
         <div class="local-env-card">
-          <div class="env-card-icon">☁️</div>
+          <div class="env-card-icon" aria-hidden="true">☁️</div>
           <div class="env-card-value">${w.cloud_cover}%</div>
           <div class="env-card-label">Cloud Cover</div>
           <div class="env-card-sub">${w.cloud_cover < 25 ? 'Clear skies ☀️' : w.cloud_cover < 50 ? 'Partly cloudy' : w.cloud_cover < 75 ? 'Mostly cloudy' : 'Overcast'}</div>
         </div>
 
         <div class="local-env-card">
-          <div class="env-card-icon">💧</div>
+          <div class="env-card-icon" aria-hidden="true">💧</div>
           <div class="env-card-value">${w.relative_humidity_2m}%</div>
           <div class="env-card-label">Humidity</div>
           <div class="env-card-sub">${w.relative_humidity_2m < 30 ? 'Dry' : w.relative_humidity_2m < 60 ? 'Comfortable' : 'Humid'}</div>
         </div>
 
         <div class="local-env-card">
-          <div class="env-card-icon">💨</div>
+          <div class="env-card-icon" aria-hidden="true">💨</div>
           <div class="env-card-value">${w.wind_speed_10m}</div>
           <div class="env-card-label">Wind Speed (km/h)</div>
           <div class="env-card-sub">${w.wind_speed_10m < 12 ? 'Calm breeze' : w.wind_speed_10m < 30 ? 'Moderate wind' : 'Strong wind'}</div>
         </div>
 
         <div class="local-env-card">
-          <div class="env-card-icon">☀️</div>
+          <div class="env-card-icon" aria-hidden="true">☀️</div>
           <div class="env-card-value">${w.uv_index}</div>
           <div class="env-card-label">UV Index</div>
           <div class="env-card-sub">${uvRisk} Risk</div>
         </div>
 
         <div class="local-env-card">
-          <div class="env-card-icon">🌡️</div>
+          <div class="env-card-icon" aria-hidden="true">🌡️</div>
           <div class="env-card-value">${daily?.temperature_2m_max?.[0]}°</div>
           <div class="env-card-label">Today's High</div>
           <div class="env-card-sub">Low: ${daily?.temperature_2m_min?.[0]}°C</div>
         </div>
 
         <div class="local-env-card">
-          <div class="env-card-icon">🏭</div>
+          <div class="env-card-icon" aria-hidden="true">🏭</div>
           <div class="env-card-value">${aqi.nitrogen_dioxide?.toFixed(0) || '—'}</div>
           <div class="env-card-label">NO₂ (µg/m³)</div>
           <div class="env-card-sub">Traffic pollution indicator</div>
         </div>
+      </div>
+      </div>
+      <div style="text-align: center; margin-top: 2rem;">
+        <p style="color:var(--text-secondary); margin-bottom: 1rem;">The air you breathe is shaped by local decisions.</p>
+        <a href="https://actionnetwork.org/" target="_blank" rel="noopener" class="btn btn-primary btn-glow" style="display:inline-block; text-decoration:none;">
+          📍 Take Action Locally
+        </a>
       </div>
     `;
 
